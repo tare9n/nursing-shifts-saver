@@ -1,8 +1,9 @@
 import sqlite3
 
-class nursingShifts:
-    def __init__(self):
-        pass
+class nurse:
+    def __init__(self, name, family):
+        self.name = name
+        self.family = family
 
     def add_hospital(self):
         pass
