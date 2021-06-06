@@ -1,21 +1,20 @@
 import sqlite3
 
-class nurse:
-    def __init__(self, name, family):
+class Nurse:
+    def __init__(self, name, family, nurse_id):
         self.name = name
         self.family = family
+        self.nurse_id = nurse_id
 
-    def add_hospital(self):
-        pass
-
-    def add_unit(self):
-        pass
+    def add_workplace(self, city, hospital, ward):
+        execute('INSERT INTO Workplaces VALUES (%s, %s, %s)' % (city, hospital, ward))
 
     def make_shift_id(self):
         pass
 
-    def add_shift(self, id, hospital, unit, year, month, day, shift, holiday = 'No'):
-        execute(f'INSERT INTO Shifts VALUES (%s, %s, %i, %i, %i, %s, %s)' %(id, hospital, unit, year, month, day, shift, holiday))
+    def add_shift(self, id, city, hospital, ward, year, month, day, shift, holiday = 'No'):
+        execute(f'INSERT INTO Shifts VALUES (%s, %s, %s, %i, %i, %i, %s, %s)'
+         %(id, city, hospital, ward, year, month, day, shift, holiday))
 
     def del_shift(self):
         pass
@@ -23,8 +22,9 @@ class nurse:
     def edit_shift(self):
         pass
 
-    def hospitals_and_units_list(self):
-        pass
+    def workplaces_list(self):
+        workplaces = execute('SELECT * FROM Workplace')
+        return workplaces
 
     def select_month(self):
         pass
@@ -34,11 +34,11 @@ class nurse:
                             Help
     ------------------------------------------------------
     - brief         See brief of your shift records
-    - add
-    - del
-    - edit
-    - units
-    - month
+    - add           add
+    - del           del
+    - edit          edit
+    - wards         wards
+    - month         select
     ------------------------------------------------------''')
 
 
@@ -46,13 +46,7 @@ def execute(text):
     cnx = sqlite3.connect('./data.db')
     cursor = cnx.cursor()
     cursor.execute(text)
+    content = [x for x in cursor] or None
     cnx.commit()
-    cnx.close()
-
-def select(text):
-    cnx = sqlite3.connect('./data.db')
-    cursor = cnx.cursor()
-    cursor.execute(text)
-    content = [x for x in cursor]
     cnx.close()
     return content
