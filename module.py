@@ -11,22 +11,25 @@ class Nurse:
     def add_workplace(self, city, hospital, ward):
         execute('INSERT INTO Workplaces VALUES (%s, %s, %s)' % (city, hospital, ward))
 
+    def del_workplace(self):
+        pass
+
     def add_shift(self, workplase = False, date = True, shift = True):
         select_wp = select_data()
-        workplase = inquirer.prompt(select_wp)
-        if workplase != '* New workplase':
+        wp = inquirer.prompt(select_wp)
+        if wp != '* New workplase':
             city = workplase['workplase'][0]
             hospital = workplase['workplase'][1]
             ward = workplase['workplase'][2]
-            workplase = False
         else:
             workplase = True
         questions = insert_data(workplase, date, shift)
         answers = inquirer.prompt(questions)
-        if city in answers.keys():
+        if 'city' and 'hospital' and 'ward' in answers.keys():
             city = answers['city']
             hospital = answers['hospital']
             ward = answers['ward']
+            self.add_workplace(city, hospital, ward)
         year = answers['year']
         month = answers['month']
         day = answers['day']
@@ -35,8 +38,24 @@ class Nurse:
         execute(f'INSERT INTO Shifts VALUES (%s, %s, %s, %i, %i, %i, %s, %s)'
          %(city, hospital, ward, year, month, day, shift, holiday))
 
-    def del_shift(self, year, month, day):
-        execute(f'SELECT * FROM Shifts WHERE year = %i AND month = %i AND day = %i' % (year, month, day))
+    def del_shift(self, date = True):
+        questions = insert_data(date)
+        answers = inquirer.prompt(questions)
+        city = answers['city']
+        hospital = answers['hospital']
+        ward = answers['ward']
+        year = answers['year']
+        month = answers['month']
+        day = answers['day']
+        shift = answers['shift']
+        holiday = answers['holiday']
+        execute(f'''DELETE FROM Shifts 
+        WHERE city = %s AND hospital = %s AND ward = %s 
+        AND year = %i AND month = %i AND day = %i
+        And shift = %s AND holiday = %s''' 
+        % (city, hospital, ward, year, month, day, shift, holiday)
+        )
+
 
     def edit_shift(self):
         pass
@@ -86,17 +105,36 @@ def insert_data(workplase = False, date = False, shift = False):
         )
     return questions
 
-def select_data():
+def select_data(workplase = False, date = False):
     questions = []
-    workplases = execute('SELECT * FROM Workplaces')
-    workplases.append('* New workplase')
-    questions.append(
-        inquirer.List(
-            'workplase',
-            message= "Select workplase: ",
-            choices= workplases
+    if workplase:
+        workplases = execute('SELECT * FROM Workplaces')
+        workplases.append('* New workplase')
+        questions.append(
+            inquirer.List(
+                'workplase',
+                message= "Select workplase: ",
+                choices= workplases
+            )
         )
-    )
+    if date:
+        query = [
+            inquirer.Text("year", message="year: "),
+            inquirer.Text("month", message="month: "),
+            inquirer.Text("day", message="day: "),
+        ]
+        answers = inquirer.prompt(query)
+        year = answers['year']
+        month = answers['month']
+        day = answers['day']
+        all_shifts = execute(f'SELECT * FROM Shifts WHERE year = %i, month = %i, day %i= ' % (year, month, day))
+        questions.append(
+            inquirer.List(
+                'shift_list',
+                message= "Select a shift: ",
+                choices= all_shifts
+            )
+        )
     return questions
 
 def help():
