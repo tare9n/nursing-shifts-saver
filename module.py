@@ -51,22 +51,26 @@ class Nurse:
          %(city, hospital, ward, year, month, day, shift, holiday))
 
     def del_shift(self, date = True):
-        questions = insert_data(date)
-        answers = inquirer.prompt(questions)
-        city = answers['city']
-        hospital = answers['hospital']
-        ward = answers['ward']
-        year = int(answers['year'])
-        month = int(answers['month'])
-        day = int(answers['day'])
-        shift = answers['shift']
-        holiday = answers['holiday']
-        execute(f'''DELETE FROM Shifts 
-        WHERE city = "%s" AND hospital = "%s" AND ward = "%s" 
-        AND year = %i AND month = %i AND day = %i
-        And shift = "%s" AND holiday = "%s"''' 
-        % (city, hospital, ward, year, month, day, shift, holiday)
-        )
+        check_shifts = execute('SELECT * FROM Shifts')
+        if check_shifts:
+            questions = select_data(date = date)
+            answers = inquirer.prompt(questions)
+            city = answers['selected_shift'][0]
+            hospital = answers['selected_shift'][1]
+            ward = answers['selected_shift'][2]
+            year = int(answers['selected_shift'][3])
+            month = int(answers['selected_shift'][4])
+            day = int(answers['selected_shift'][5])
+            shift = answers['selected_shift'][6]
+            holiday = answers['selected_shift'][7]
+            execute(f'''DELETE FROM Shifts 
+            WHERE city = "%s" AND hospital = "%s" AND ward = "%s" 
+            AND year = %i AND month = %i AND day = %i
+            And shift = "%s" AND holiday = "%s"''' 
+            % (city, hospital, ward, year, month, day, shift, holiday)
+            )
+        else:
+            print('You don\'t save any shift yet.')
 
     def edit_shift(self):
         pass
@@ -78,8 +82,11 @@ class Nurse:
 
     def select_month(self, year, month):
         shifts = execute(f'SELECT * FROM Shifts WHERE year = %i And month = %i' % (year, month))
-        for shift in shifts:
-            print(shift)
+        if shifts:
+            for shift in shifts:
+                print(shift)
+        else:
+            print('You don\'t save any shift in that month.')
 
 def execute(text):
     cnx = sqlite3.connect('./data.db')
@@ -94,29 +101,29 @@ def insert_data(workplace = False, date = False, shift = False, user = False):
     questions = []
     if workplace:
         questions.append(
-            inquirer.Text("city", message="City: ")
+            inquirer.Text("city", message="City")
         )
         questions.append(
-            inquirer.Text("hospital", message="Hospital name: ")
+            inquirer.Text("hospital", message="Hospital name")
         )
         questions.append(
-            inquirer.Text("ward", message="Ward: ")
+            inquirer.Text("ward", message="Ward")
         )
     if date:
         questions.append(
-            inquirer.Text("year", message="year: ")
+            inquirer.Text("year", message="year")
         )
         questions.append(
-            inquirer.Text("month", message="month: ")
+            inquirer.Text("month", message="month")
         )
         questions.append(
-            inquirer.Text("day", message="day: "),
+            inquirer.Text("day", message="day"),
         )
     if shift:
         questions.append(
             inquirer.Checkbox(
                 'shift',
-                message= 'Check shift(s): ',
+                message= 'Check shift(s)',
                 choices= ['M', 'E', 'N']
             )
         )
@@ -129,46 +136,51 @@ def insert_data(workplace = False, date = False, shift = False, user = False):
         )
     if user:
         questions.append(
-            inquirer.Text("name", message="Mame: ")
+            inquirer.Text("name", message="Mame")
         )
         questions.append(
-            inquirer.Text("family", message="Family: ")
+            inquirer.Text("family", message="Family")
         )
         questions.append(
-            inquirer.Text("nurse_id", message="Nursing id: "),
+            inquirer.Text("nurse_id", message="Nursing id"),
         )
     return questions
 
 def select_data(workplace = False, date = False):
     questions = []
-    if workplace:
+    if workplace == True:
         workplaces = execute('SELECT * FROM Workplaces') or []
         workplaces.append('* New workplace')
         questions.append(
             inquirer.List(
                 'workplace',
-                message= "Select workplace: ",
+                message= "Select workplace",
                 choices= workplaces
             )
         )
     if date:
-        query = [
-            inquirer.Text("year", message="year: "),
-            inquirer.Text("month", message="month: "),
-            inquirer.Text("day", message="day: "),
-        ]
-        answers = inquirer.prompt(query)
-        year = int(answers['year'])
-        month = int(answers['month'])
-        day = int(answers['day'])
-        all_shifts = execute(f'SELECT * FROM Shifts WHERE year = %i, month = %i, day %i= ' % (year, month, day))
-        questions.append(
-            inquirer.List(
-                'shift_list',
-                message= "Select a shift: ",
-                choices= all_shifts
-            )
-        )
+        while True:
+            query = [
+                inquirer.Text("year", message="year"),
+                inquirer.Text("month", message="month"),
+                inquirer.Text("day", message="day"),
+            ]
+            answers = inquirer.prompt(query)
+            year = int(answers['year'])
+            month = int(answers['month'])
+            day = int(answers['day'])
+            all_shifts = execute(f'SELECT * FROM Shifts WHERE year = %i AND month = %i AND day = %i ' % (year, month, day))
+            if all_shifts:
+                questions.append(
+                    inquirer.List(
+                        'selected_shift',
+                        message= "Select a shift",
+                        choices= all_shifts
+                    )
+                )
+                break
+            else:
+                print(' You don\'t save any shift in this date.')
     return questions
 
 def help():

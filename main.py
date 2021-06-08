@@ -8,7 +8,7 @@ execute('''CREATE TABLE IF NOT EXISTS Workplaces
     (city TEXT, hospital TEXT, unit TEXT)''')
 
 execute('''CREATE TABLE IF NOT EXISTS Shifts 
-    (city TEXT, hospital TEXT, unit TEXT, year NUMBER, month NUMBER, day NUMBER, shift TEXT, holiday TEXT)''')
+    (city TEXT, hospital TEXT, ward TEXT, year NUMBER, month NUMBER, day NUMBER, shift TEXT, holiday TEXT)''')
 
 users = execute('SELECT * From Users')
 if users:
