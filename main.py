@@ -5,7 +5,7 @@ execute('''CREATE TABLE IF NOT EXISTS Users
     (u_name TEXT, u_family TEXT, u_id TEXT)''')
 
 execute('''CREATE TABLE IF NOT EXISTS Workplaces 
-    (city TEXT, hospital TEXT, unit TEXT)''')
+    (city TEXT, hospital TEXT, ward TEXT)''')
 
 execute('''CREATE TABLE IF NOT EXISTS Shifts 
     (city TEXT, hospital TEXT, ward TEXT, year NUMBER, month NUMBER, day NUMBER, shift TEXT, holiday TEXT)''')
@@ -29,7 +29,7 @@ print(f'Hello %s. ' % name)
 while True:
     while True:
         act = input('-> ')
-        if act in ('brief', 'add', 'del', 'wp', 'add-wp', 'month', 'exit'):
+        if act in ('brief', 'add', 'del', 'wp', 'add-wp', 'del-wp', 'month', 'exit'):
             break
         else:
             print('Invalid Input. Try again!')
@@ -43,6 +43,8 @@ while True:
         nurse.workplaces_list()
     elif act == 'add-wp':
         nurse.add_workplace()
+    elif act == 'del-wp':
+        nurse.del_workplace()
     elif act == 'month':
         year = int(input('Year: '))
         month = int(input('Month: '))

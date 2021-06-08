@@ -13,19 +13,22 @@ class Nurse:
     def add_workplace(self, city, hospital, ward):
         execute('INSERT INTO Workplaces VALUES ("%s", "%s", "%s")' % (city, hospital, ward))
 
-    def del_workplace(self, city):
-        wp_list = execute('SELECT * FROM Workplaces WHERE city = "%s"' % city)
-        questions = inquirer.List(
-            'Workplaces',
-            message= 'Select a Workplace: ',
-            choices= wp_list
-        )
-        answers = inquirer.prompt(questions)
-        city = answers['Workplaces'][0]
-        hospital = answers['Workplaces'][1]
-        ward = answers['Workplaces'][2]
-        execute('DELETE FROM Workplaces WHERE city = "%s" AND hospital = "%s" AND ward = "%s")' 
-        % (city, hospital, ward))
+    def del_workplace(self):
+        wp_list = execute('SELECT * FROM Workplaces')
+        if wp_list:
+            questions = [inquirer.List(
+                'Workplaces',
+                message= 'Select a Workplace',
+                choices= wp_list
+            )]
+            answers = inquirer.prompt(questions)
+            city = answers['Workplaces'][0]
+            hospital = answers['Workplaces'][1]
+            ward = answers['Workplaces'][2]
+            execute("DELETE FROM Workplaces WHERE city = '%s' AND hospital = '%s' AND ward = '%s'" 
+            % (city, hospital, ward))
+        else:
+            print('You don\'t define any workplace')
 
     def add_shift(self, workplace = True, date = True, shift = True):
         select_wp = select_data(workplace)
@@ -76,9 +79,12 @@ class Nurse:
         pass
 
     def workplaces_list(self):
-        workplaces = execute('SELECT * FROM Workplace')
-        for wp in workplaces:
-            print(wp)
+        workplaces = execute('SELECT * FROM Workplaces')
+        if workplaces:
+            for wp in workplaces:
+                print(wp)
+        else:
+            print('You don\'t define any workplace yet.')
 
     def select_month(self, year, month):
         shifts = execute(f'SELECT * FROM Shifts WHERE year = %i And month = %i' % (year, month))
@@ -192,6 +198,7 @@ def help():
 - del           Del a shift from database
 - edit          Edit a shift from database
 - wp            See list og workplaces
-- add-wp        define new workplace
+- add-wp        Define new workplace
+- del-wp        Delete defined workplace
 - month         Select an show shifts of a month
 ------------------------------------------------------''')
