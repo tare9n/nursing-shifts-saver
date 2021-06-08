@@ -10,7 +10,12 @@ class Nurse:
     def brief(self):
         pass
 
-    def add_workplace(self, city, hospital, ward):
+    def add_workplace(self, workplace = True):
+        questions = insert_data(workplace = workplace)
+        answers = inquirer.prompt(questions)
+        city = answers['city']
+        hospital = answers['hospital']
+        ward = answers['ward']
         execute('INSERT INTO Workplaces VALUES ("%s", "%s", "%s")' % (city, hospital, ward))
 
     def del_workplace(self):
