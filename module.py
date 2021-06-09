@@ -1,5 +1,6 @@
 import sqlite3
 import inquirer
+import os
 
 class Nurse:
     def __init__(self, name, family, nurse_id):
@@ -8,9 +9,11 @@ class Nurse:
         self.nurse_id = nurse_id
     
     def brief(self):
+        os.system('cls')
         pass
 
     def add_workplace(self, workplace = True):
+        os.system('cls')
         questions = insert_data(workplace = workplace)
         answers = inquirer.prompt(questions)
         city = answers['city']
@@ -19,6 +22,7 @@ class Nurse:
         execute('INSERT INTO Workplaces VALUES ("%s", "%s", "%s")' % (city, hospital, ward))
 
     def del_workplace(self):
+        os.system('cls')
         wp_list = execute('SELECT * FROM Workplaces')
         if wp_list:
             questions = [inquirer.List(
@@ -36,6 +40,7 @@ class Nurse:
             print('You don\'t define any workplace')
 
     def add_shift(self, workplace = True, date = True, shift = True):
+        os.system('cls')
         select_wp = select_data(workplace)
         wp = inquirer.prompt(select_wp)
         if wp['workplace'] != '* New workplace':
@@ -49,16 +54,17 @@ class Nurse:
             city = answers['city']
             hospital = answers['hospital']
             ward = answers['ward']
-            self.add_workplace(city, hospital, ward)
+            execute('INSERT INTO Workplaces VALUES ("%s", "%s", "%s")' % (city, hospital, ward))
         year = int(int(answers['year']))
         month = int(int(answers['month']))
         day = int(int(answers['day']))
         shift = answers['shift']
         holiday = answers['holiday']
         execute(f'INSERT INTO Shifts VALUES ("%s", "%s", "%s", %i, %i, %i, "%s", "%s")'
-         %(city, hospital, ward, year, month, day, shift, holiday))
+         % (city, hospital, ward, year, month, day, shift, holiday))
 
     def del_shift(self, date = True):
+        os.system('cls')
         check_shifts = execute('SELECT * FROM Shifts')
         if check_shifts:
             questions = select_data(date = date)
@@ -75,8 +81,7 @@ class Nurse:
             WHERE city = "%s" AND hospital = "%s" AND ward = "%s" 
             AND year = %i AND month = %i AND day = %i
             And shift = "%s" AND holiday = "%s"''' 
-            % (city, hospital, ward, year, month, day, shift, holiday)
-            )
+            % (city, hospital, ward, year, month, day, shift, holiday))
         else:
             print('You don\'t save any shift yet.')
 
@@ -84,6 +89,7 @@ class Nurse:
         pass
 
     def workplaces_list(self):
+        os.system('cls')
         workplaces = execute('SELECT * FROM Workplaces')
         if workplaces:
             for wp in workplaces:
@@ -92,10 +98,12 @@ class Nurse:
             print('You don\'t define any workplace yet.')
 
     def select_month(self, year, month):
+        os.system('cls')
         shifts = execute(f'SELECT * FROM Shifts WHERE year = %i And month = %i' % (year, month))
         if shifts:
             for shift in shifts:
-                print(shift)
+                city, hospital, ward, year, month, day, shift, holiday = shift
+                print(f' - %i/%i/%i: %s holiday: %s (%s - %s: %s)' % (year, month, day, shift, holiday, city, hospital, ward))
         else:
             print('You don\'t save any shift in that month.')
 

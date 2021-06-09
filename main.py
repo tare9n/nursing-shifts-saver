@@ -1,4 +1,3 @@
-from os import truncate
 from module import *
 
 execute('''CREATE TABLE IF NOT EXISTS Users 
@@ -24,7 +23,7 @@ else:
     execute(f'INSERT INTO Users VALUES ("%s", "%s", "%s")' % (name, family, nurse_id))
 nurse = Nurse(name, family, nurse_id)
 
-print(f'Hello %s. ' % name)
+print(f'Hello %s %s. ' % (name, family))
 
 while True:
     while True:
