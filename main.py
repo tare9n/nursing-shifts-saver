@@ -1,13 +1,6 @@
 from module import *
 
-execute('''CREATE TABLE IF NOT EXISTS Users 
-    (u_name TEXT, u_family TEXT, u_id TEXT)''')
-
-execute('''CREATE TABLE IF NOT EXISTS Workplaces 
-    (city TEXT, hospital TEXT, ward TEXT)''')
-
-execute('''CREATE TABLE IF NOT EXISTS Shifts 
-    (city TEXT, hospital TEXT, ward TEXT, year NUMBER, month NUMBER, day NUMBER, shift TEXT, holiday TEXT)''')
+make_database()
 
 users = execute('SELECT * From Users')
 if users:

@@ -116,6 +116,14 @@ def execute(text):
     cnx.close()
     return content
 
+def make_database():
+    execute('''CREATE TABLE IF NOT EXISTS Users 
+        (u_name TEXT, u_family TEXT, u_id TEXT)''')
+    execute('''CREATE TABLE IF NOT EXISTS Workplaces 
+        (city TEXT, hospital TEXT, ward TEXT)''')
+    execute('''CREATE TABLE IF NOT EXISTS Shifts 
+        (city TEXT, hospital TEXT, ward TEXT, year NUMBER, month NUMBER, day NUMBER, shift TEXT, holiday TEXT)''')
+
 def insert_data(workplace = False, date = False, shift = False, user = False):
     questions = []
     if workplace:
